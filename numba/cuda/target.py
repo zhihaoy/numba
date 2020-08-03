@@ -22,10 +22,11 @@ from numba.cpython import cmathimpl
 
 class CUDATypingContext(typing.BaseContext):
     def load_additional_registries(self):
-        from . import cudadecl, cudamath
+        from . import cudadecl, cudamath, scalardecl
 
         self.install_registry(cudadecl.registry)
         self.install_registry(cudamath.registry)
+        self.install_registry(scalardecl.registry)
         self.install_registry(cmathdecl.registry)
 
     def resolve_value_type(self, val):
@@ -74,9 +75,10 @@ class CUDATargetContext(BaseContext):
         self._target_data = ll.create_target_data(nvvm.default_data_layout)
 
     def load_additional_registries(self):
-        from . import cudaimpl, printimpl, libdevice
+        from . import cudaimpl, printimpl, scalarimpl, libdevice
         self.install_registry(cudaimpl.registry)
         self.install_registry(printimpl.registry)
+        self.install_registry(scalarimpl.registry)
         self.install_registry(libdevice.registry)
         self.install_registry(cmathimpl.registry)
 

@@ -110,6 +110,10 @@ def simple_warpsize(ary):
     ary[0] = cuda.warpsize
 
 
+def simple_view_i4(ary, n):
+    ary[0] = np.float32(n).view(np.int32)
+
+
 class TestCudaIntrinsic(CUDATestCase):
     def test_simple_threadidx(self):
         compiled = cuda.jit("void(int32[:])")(simple_threadidx)
@@ -377,6 +381,13 @@ class TestCudaIntrinsic(CUDATestCase):
         ary = np.zeros(1, dtype=np.int32)
         compiled[1, 1](ary)
         self.assertEquals(ary[0], 32, "CUDA semantics")
+
+    def test_view_f4_to_i4(self):
+        compiled = cuda.jit("void(int32[:], float32)")(simple_view_i4)
+        ary = np.zeros(1, dtype=np.int32)
+        flt = np.float32(3.14)
+        compiled[1, 1](ary, flt)
+        np.testing.assert_array_equal(ary, flt.view('i4'))
 
     def test_round_f4(self):
         compiled = cuda.jit("void(int64[:], float32)")(simple_round)
